@@ -1,6 +1,4 @@
 {
-  
-  {
   "name": "discord.io",
   "version": "2.5.3",
   "description": "JavaScript interface for Discord.",
@@ -31,27 +29,4 @@
     "tweetnacl": "^0.14.0",
     "ws": "^1.1.0"
   }
-
-  "name": "Test",
-
-  "description": "Test",
-
-  "version": "0.0.0",
-
-  "main": "bot.js",
-
-  "scripts": {
-
-    "start": "node bot.js"
-
-  },
-
-  "dependencies": {
-
-    "discord.js": "11.1.0",
-
-    "request": "2.81.0"
-
-  }
-
 }
