@@ -9,11 +9,8 @@ client.on('ready', () => {
 
 });
 
- 
 
-client.on('message', message => {
-
-    // Set the prefix
+// Set the prefix
 const prefix = "!";
 client.on("message", (message) => {
   // Exit and stop if it's not there
