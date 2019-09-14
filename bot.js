@@ -1,53 +1,5 @@
 const Discord = require('discord.js');
 const client = new Discord.Client();
-const settings = require('./config.json');
-var statustring = "No signal";
-
-var request = require('request');
-var mcCommand = '/minecraft'; // Command for triggering
-var mcIP = settings.ip; // Your MC server IP
-var mcPort = settings.port; // Your MC server port
-var url = 'http://mcapi.us/server/status?ip=' + mcIP;
-
-function update() {
-  /*seconds = seconds + 1;
-  secondsString = seconds.toString();
-  client.user.setActivity(secondsString, { type: 'Playing' })
-  .then(presence => console.log(`Activity set to ${presence.game ? presence.game.name : 'none'}`))
-  .catch(console.error);*/
-  request(url, function(err, response, body) {
-      if(err) {
-          console.log(err);
-          //return message.reply('Error getting Minecraft server status...');
-      }
-      body = JSON.parse(body);
-      var status = 'Server offline';
-      console.log(body.motd);
-      if(body.online) {
-          if((body.motd=="&cWe are under maintenance.")||(body.players.now>=body.players.max)){
-            message.reply('Offline');
-            //.then(console.log)
-            .catch(console.error);
-          }else{
-            message.reply('Online');
-            //.then(console.log)
-            .catch(console.error);
-          }
-            if(body.players.now) {
-                status = ' ' + body.players.now + '  of  ' + body.players.max;
-              } else {
-                status = ' 0  of  ' + body.players.max;
-        }
-      } else {
-        message.reply('Offline');
-        //.then(console.log)
-        .catch(console.error);
-
-      }
-      client.user.setActivity(status, { type: 'PLAYING' })
-      .then(presence => console.log(status))
-      .catch(console.error);
-  });
 
  
 
@@ -63,7 +15,7 @@ client.on('message', message => {
 
     if (message.content === 'ping') {
 
-       client.setInterval(update,30000);
+       message.reply('pong');
 
        }
 
