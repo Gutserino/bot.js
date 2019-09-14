@@ -9,7 +9,7 @@ var mcCommand = '/minecraft'; // Command for triggering
 var mcIP = settings.ip; // Your MC server IP
 var mcPort = settings.port; // Your MC server port
 
-var url = 'http://mcapi.us/server/status?ip=' + mcIP + '&port=' + mcPort;
+var url = 'http://mcapi.us/server/status?ip=' + mcIP;
 
 
 function update() {
