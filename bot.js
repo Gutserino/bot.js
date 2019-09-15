@@ -25,7 +25,7 @@ var quotes = [
     "Die Amerikaner haben uns verboten Flugzeuge zu bauen, ich sage, wir werden so viele Flugzeuge bauen, dass der Himmel schwarz ist und die Vögel zu Fuß gehen müssen! Adolf Hitler",
     "Die Welt will betrügen oder betrogen werden, darum hat die Welt mit der Wahrheit nichts zu schaffen. Martin Luther",
     "Regierung ist nicht Vernunft, nicht Beredsamkeit – sondern Gewalt. George Washington",
-    "",
+   
     ];
 
 client.on('ready', () => {
