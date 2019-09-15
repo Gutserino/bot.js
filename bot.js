@@ -41,7 +41,7 @@ client.on("message", (message) => {
   if (!message.content.startsWith(prefix)) return;
  
   if (message.content.startsWith(prefix + "command")) {
-    message.channel.send("Write ![Command] in the Chat for usage." + "\n" + "-quote Displays a Random quote" + "\n" + "-Shows discord invite Link");
+    message.channel.send("Write ![Command] in the Chat for usage." + "\n" + "-quote Displays a Random quote" + "\n" + "-invite Shows discord invite Link");
   } else
   if (message.content.startsWith(prefix + "quote")) {
     message.channel.send(quotes[Math.floor(Math.random() * quotes.length)]);
