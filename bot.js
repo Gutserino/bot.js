@@ -1,7 +1,7 @@
 const Discord = require('discord.js');
 const client = new Discord.Client();
 
-var randomnumber = Math.floor(math.random() * (quotes.length));
+var randomnumber = Math.floor(Math.random() * (quotes.length));
 var quotes = [
  '1'
  '2'
