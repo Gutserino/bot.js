@@ -1,6 +1,7 @@
 const Discord = require('discord.js');
 const client = new Discord.Client();
- 
+
+var messages = ["Hello!", "How are you doing?", "Howdy!"]
 
 client.on('ready', () => {
 
@@ -19,7 +20,7 @@ client.on("message", (message) => {
     message.channel.send("pong!");
   } else
   if (message.content.startsWith(prefix + "joke")) {
-    message.channel.send("blabla");
+    message.channel.send(random.choice(messages));
   }
 
 });
