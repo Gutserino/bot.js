@@ -8,7 +8,7 @@ var facts = [
     ];
 
 client.on('ready', () => {
-    client.user.setActivity('Celebration Bunker', { type: 'WATCHING' });
+    client.user.setActivity("Celebration Bunker");
     console.log('Jawohl, mein Führer!');
 
 });
