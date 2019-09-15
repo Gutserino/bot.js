@@ -1,6 +1,8 @@
 const Discord = require('discord.js');
 const client = new Discord.Client();
 
+const messages = ['message1', 'message2', 'message3', 'message4'];
+const randomIndex = Math.round(Math.random()*messages.length);
  
 
 client.on('ready', () => {
@@ -19,8 +21,8 @@ client.on("message", (message) => {
   if (message.content.startsWith(prefix + "status")) {
     message.channel.send("pong!");
   } else
-  if (message.content.startsWith(prefix + "foo")) {
-    message.channel.send("bar!");
+  if (message.content.startsWith(prefix + "joke")) {
+    message.channel.send(messages[randomIndex]);
   }
 
 });
