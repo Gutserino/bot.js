@@ -46,6 +46,9 @@ client.on("message", (message) => {
   if (message.content.startsWith(prefix + "quote")) {
     message.channel.send(quotes[Math.floor(Math.random() * quotes.length)]);
   }
+    if (message.content.startsWith(prefix + "sag")) {
+    message.channel.send("/tts " + message );
+  } else
 
 });
 
