@@ -1,7 +1,7 @@
 const Discord = require('discord.js');
 const client = new Discord.Client();
 
-var messages = ["Hello!", "How are you doing?", "Howdy!"]
+messages = ["Hello!", "How are you doing?", "Howdy!"]
 
 client.on('ready', () => {
 
