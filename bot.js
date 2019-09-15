@@ -1,5 +1,6 @@
 const Discord = require('discord.js');
 const client = new Discord.Client();
+const game = "Celebration Bunker"
 
 var facts = [
     "1",
@@ -8,7 +9,7 @@ var facts = [
     ];
 
 client.on('ready', () => {
-    client.user.setGame("Celebration Bunker")
+    client.user.setGame(game)
     console.log('Jawohl, mein Führer!');
 
 });
