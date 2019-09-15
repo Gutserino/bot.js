@@ -1,7 +1,7 @@
 const Discord = require('discord.js');
 const client = new Discord.Client();
 
-var facts = ["Your facts", "...", "..."];
+var facts = ["1", "2", "3"];
 var fact = Math.floor(Math.random() * facts.length);
 
 client.on('ready', () => {
