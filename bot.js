@@ -1,8 +1,12 @@
 const Discord = require('discord.js');
 const client = new Discord.Client();
 
-const messages = ['message1', 'message2', 'message3', 'message4'];
-const randomIndex = Math.floor(Math.random()*messages.length);
+var randomnumber = Math.floor(math.random() * (quotes.length));
+var quotes = [
+ '1'
+ '2'
+ '3'
+ ]
  
 
 client.on('ready', () => {
@@ -22,7 +26,7 @@ client.on("message", (message) => {
     message.channel.send("pong!");
   } else
   if (message.content.startsWith(prefix + "joke")) {
-    message.channel.send(messages[randomIndex]);
+    message.channel.send(quotes[randomnumber]);
   }
 
 });
