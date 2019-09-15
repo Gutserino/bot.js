@@ -23,7 +23,7 @@ client.on("message", (message) => {
   if (!message.content.startsWith(prefix)) return;
  
   if (message.content.startsWith(prefix + "commands")) {
-    message.channel.send("!quote -Displays a Random Quote");
+    message.channel.send(""!quote" -Displays a Random Quote");
   } else
   if (message.content.startsWith(prefix + "quote")) {
     message.channel.send(quotes[Math.floor(Math.random() * quotes.length)]);
