@@ -8,8 +8,8 @@ var facts = [
     ];
 
 client.on('ready', () => {
-
-    console.log('I am ready!');
+    client.user.setGame("Celebration Bunker")
+    console.log('Jawohl, mein Führer!');
 
 });
 
