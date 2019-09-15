@@ -2,7 +2,7 @@ const Discord = require('discord.js');
 const client = new Discord.Client();
 
 const messages = ['message1', 'message2', 'message3', 'message4'];
-const randomIndex = Math.round(Math.random()*messages.length);
+const randomIndex = Math.floor(Math.random()*messages.length);
  
 
 client.on('ready', () => {
