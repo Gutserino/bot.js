@@ -2,9 +2,9 @@ const Discord = require('discord.js');
 const client = new Discord.Client();
 
 var facts = [
-    '1'
-    '2'
-    '3'
+    "1",
+    "2",
+    "3",
     ];
 
 client.on('ready', () => {
