@@ -1,59 +1,124 @@
 const Discord = require('discord.js');
+const {
+	prefix,
+	token,
+} = require('./config.json');
+const ytdl = require('ytdl-core');
+
 const client = new Discord.Client();
 
-var quotes = [
-    "Ich habe große Achtung vor den deutschen Soldaten. In Wirklichkeit sind die Deutschen das einzige anständige in Europa lebende Volk. George S. Patton",
-    "Die Deutschen sind unfähig, aus der Geschichte zu lernen.Genauso wie sie 1939 Hitler in den Krieg folgten, so würden sie Heute in ihrer Blindheit, Merkel in den Abgrund folgen. Wladimir Wladimirowitsch Putin",
-    "Verbrenne ihre Synagogen, zwinge sie zur Arbeit und gehe mit ihnen nach aller Unbarmherzigkeit um. Martin Luther",
-    "Luther war ein großer Mann, ein Riese. Mit einem Ruck durchbrach er die Dämmerung: sah den Juden, wie wir ihn erst heute zu sehen beginnen. Adolf Hitler",
-    "Herrgott, gib uns die Kraft, daß wir uns die Freiheit erhalten, unserem Volk, unseren Kindern und unseren Kindeskindern, nicht nur uns Deutschen, sondern auch den anderen Völkern Europas. Denn es ist nicht ein Krieg, den wir alle dieses Mal führen nur für unser deutsches Volk allein, es ist ein Krieg für ganz Europa und damit wirklich für die ganze Menschheit.",
-    "Denn nur ein Volk ohne brot hört auf die befreier aus seiner not und erkennt im völkerherd seines Vaterlandes wert und den der die freiheit uns verwehrt.",
-    "Veni. Vidi. Vici. - Ich kam.Ich sah.Ich siegte. Julius Caesar",
-    "Was interessiert mich mein Geschwätz von gestern. Konrad Adenauer",
-    "Ich bin wie ich bin, die einen kennen mich, die anderen können mich. Konrad Adenauer",
-    "Alles, was die Sozialisten vom Geld verstehen, ist die Tatsache, dass sie es von anderen haben wollen. Konrad Adenauer",
-    "Zuerst ignorieren sie dich, dann lachen sie über dich, dann bekämpfen sie dich und dann gewinnst du. Mahatma Gandhi",
-    "Sei du selbst die Veränderung, die du dir wünschst für diese Welt. Mahatma Gandhi",
-    "Liebe ist die stärkste Macht der Welt, und doch ist sie die demütigste, die man sich vorstellen kann. Mahatma Gandhi",
-    "Stärke wächst nicht aus körperlicher Kraft - vielmehr aus unbeugsamen Willen. Mahatma Gandhi",
-    "Die Freiheit der Meinung setzt voraus, daß man eine hat. Heinrich Heine",
-    "Wenn du den wahren Charakter eines Menschen erkennen willst, dann gib ihm Macht. Abraham Lincoln",
-    "Wer anderen die Freiheit verweigert, verdient sie nicht für sich selbst. Abraham Lincoln",
-    "Demokratie ist die Regierung des Volkes, durch das Volk, für das Volk. Abraham Lincoln",
-    "Je größer die Lüge, desto mehr Menschen folgen ihr. Adolf Hitler",
-    "Und wir wissen, vor uns liegt Deutschland, in uns marschiert Deutschland und hinter uns. Adolf Hitler",
-    "Die Amerikaner haben uns verboten Flugzeuge zu bauen, ich sage, wir werden so viele Flugzeuge bauen, dass der Himmel schwarz ist und die Vögel zu Fuß gehen müssen! Adolf Hitler",
-    "Die Welt will betrügen oder betrogen werden, darum hat die Welt mit der Wahrheit nichts zu schaffen. Martin Luther",
-    "Regierung ist nicht Vernunft, nicht Beredsamkeit – sondern Gewalt. George Washington",
-   
-    ];
+const queue = new Map();
 
-client.on('ready', () => {
-    console.log('Jawohl, mein Führer!');
-
+client.once('ready', () => {
+	console.log('Ready!');
 });
 
-
-// Set the prefix
-const prefix = "!";
-client.on("message", (message) => {
-  // Exit and stop if it's not there
-  if (!message.content.startsWith(prefix)) return;
- 
-  if (message.content.startsWith(prefix + "command")) {
-    message.channel.send("Write ![Command] in the Chat for usage." + "\n" + "-quote Displays a Random quote" + "\n" + "-discord Shows discord invite Link");
-  } else
-  if (message.content.startsWith(prefix + "quote")) {
-    message.channel.send(quotes[Math.floor(Math.random() * quotes.length)]);
-  }
-    if (message.content.startsWith(prefix + "discord")) {
-    message.channel.send("https://discord.gg/nzh5Aw" );
-  } 
-
+client.once('reconnecting', () => {
+	console.log('Reconnecting!');
 });
 
- 
+client.once('disconnect', () => {
+	console.log('Disconnect!');
+});
 
-// THIS  MUST  BE  THIS  WAY
+client.on('message', async message => {
+	if (message.author.bot) return;
+	if (!message.content.startsWith(prefix)) return;
 
-client.login(process.env.BOT_TOKEN);//where BOT_TOKEN is the token of our bot
+	const serverQueue = queue.get(message.guild.id);
+
+	if (message.content.startsWith(`${prefix}play`)) {
+		execute(message, serverQueue);
+		return;
+	} else if (message.content.startsWith(`${prefix}skip`)) {
+		skip(message, serverQueue);
+		return;
+	} else if (message.content.startsWith(`${prefix}stop`)) {
+		stop(message, serverQueue);
+		return;
+	} else {
+		message.channel.send('You need to enter a valid command!')
+	}
+});
+
+async function execute(message, serverQueue) {
+	const args = message.content.split(' ');
+
+	const voiceChannel = message.member.voiceChannel;
+	if (!voiceChannel) return message.channel.send('You need to be in a voice channel to play music!');
+	const permissions = voiceChannel.permissionsFor(message.client.user);
+	if (!permissions.has('CONNECT') || !permissions.has('SPEAK')) {
+		return message.channel.send('I need the permissions to join and speak in your voice channel!');
+	}
+
+	const songInfo = await ytdl.getInfo(args[1]);
+	const song = {
+		title: songInfo.title,
+		url: songInfo.video_url,
+	};
+
+	if (!serverQueue) {
+		const queueContruct = {
+			textChannel: message.channel,
+			voiceChannel: voiceChannel,
+			connection: null,
+			songs: [],
+			volume: 5,
+			playing: true,
+		};
+
+		queue.set(message.guild.id, queueContruct);
+
+		queueContruct.songs.push(song);
+
+		try {
+			var connection = await voiceChannel.join();
+			queueContruct.connection = connection;
+			play(message.guild, queueContruct.songs[0]);
+		} catch (err) {
+			console.log(err);
+			queue.delete(message.guild.id);
+			return message.channel.send(err);
+		}
+	} else {
+		serverQueue.songs.push(song);
+		console.log(serverQueue.songs);
+		return message.channel.send(`${song.title} has been added to the queue!`);
+	}
+
+}
+
+function skip(message, serverQueue) {
+	if (!message.member.voiceChannel) return message.channel.send('You have to be in a voice channel to stop the music!');
+	if (!serverQueue) return message.channel.send('There is no song that I could skip!');
+	serverQueue.connection.dispatcher.end();
+}
+
+function stop(message, serverQueue) {
+	if (!message.member.voiceChannel) return message.channel.send('You have to be in a voice channel to stop the music!');
+	serverQueue.songs = [];
+	serverQueue.connection.dispatcher.end();
+}
+
+function play(guild, song) {
+	const serverQueue = queue.get(guild.id);
+
+	if (!song) {
+		serverQueue.voiceChannel.leave();
+		queue.delete(guild.id);
+		return;
+	}
+
+	const dispatcher = serverQueue.connection.playStream(ytdl(song.url))
+		.on('end', () => {
+			console.log('Music ended!');
+			serverQueue.songs.shift();
+			play(guild, serverQueue.songs[0]);
+		})
+		.on('error', error => {
+			console.error(error);
+		});
+	dispatcher.setVolumeLogarithmic(serverQueue.volume / 5);
+}
+
+client.login(process.env.BOT_TOKEN);
