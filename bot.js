@@ -1,6 +1,13 @@
 const Discord = require('discord.js');
 const client = new Discord.Client();
-
+var jokes  = [
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    ];
 var quotes = [
     "Ich habe große Achtung vor den deutschen Soldaten. In Wirklichkeit sind die Deutschen das einzige anständige in Europa lebende Volk. George S. Patton",
     "Die Deutschen sind unfähig, aus der Geschichte zu lernen.Genauso wie sie 1939 Hitler in den Krieg folgten, so würden sie Heute in ihrer Blindheit, Merkel in den Abgrund folgen. Wladimir Wladimirowitsch Putin",
@@ -49,7 +56,9 @@ client.on("message", (message) => {
     if (message.content.startsWith(prefix + "discord")) {
     message.channel.send("https://discord.gg/nzh5Aw" );
   } 
-
+  if (message.content.startsWith(prefix + "joke")) {
+    message.channel.send(jokes[Math.floor(Math.random() * quotes.length)]);
+  }
 });
 
  
