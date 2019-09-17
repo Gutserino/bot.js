@@ -1,12 +1,20 @@
 const Discord = require('discord.js');
 const client = new Discord.Client();
 var jokes  = [
-    "1",
-    "2",
-    "3",
-    "4",
-    "5",
-    "6",
+    "Was ist der Unterschied zwischen einem Juden und einer Pizza? – Die Pizza schreit nicht, wenn sie in den Ofen geschoben wird.",
+    "Was ist der Unterschied zwischen Pfadfindern und Juden? – Pfadfinder kommen von deren Camps zurück.",
+    "Wie bekommt man die Nummer einer Jüdin? – Einfach den Ärmel aufkrempeln.",
+    "Wie nennt man einen Deutschen Panzer im Judenviertel? - Einen Ghettoblaster.",
+    "Was ist der Unterschied zwischen Harry Potter und einem Juden? - Harry Potter kam aus der Kammer zurück.",
+    "Ein Türke, ein Italiener und ein Pole sitzen zusammen in einem Auto. Wer fährt? - Die Polizei.",
+    "Was heißt Windel auf Türkisch? - Güllehülle.",
+    "Woran erkennt man eine türkische Domina? - An ihrem Lederkopftuch.",
+    "Was heißt onanieren auf türkisch? - Würk de Gürk.",
+    "Was macht ein Türke zwischen zwei Mülltonnen? - Ein Familienfoto.",
+    "Wielang kannst du einen Türken mit einem Auge ansehen? - Bis das Magazin leer ist.",
+    "Was machst du wenn hundert tote Türken vor die liegen? - Aufhören zu lachen, nachladen und weiterschiessen.",
+    "Was ist der Lieblingsfilm der Juden? - Vom Winde verweht.",
+    "Was haben GTA und Juden gemeinsam? - Hast du einen Stern, wirst du verfolgt.",
     ];
 var quotes = [
     "Ich habe große Achtung vor den deutschen Soldaten. In Wirklichkeit sind die Deutschen das einzige anständige in Europa lebende Volk. George S. Patton",
