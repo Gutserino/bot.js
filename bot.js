@@ -1,194 +1,59 @@
-const { Client, Util } = require('discord.js');
-const { TOKEN, PREFIX, GOOGLE_API_KEY } = require('./config');
-const YouTube = require('simple-youtube-api');
-const ytdl = require('ytdl-core');
+const Discord = require('discord.js');
+const client = new Discord.Client();
 
-const client = new Client({ disableEveryone: true });
+var quotes = [
+    "Ich habe große Achtung vor den deutschen Soldaten. In Wirklichkeit sind die Deutschen das einzige anständige in Europa lebende Volk. George S. Patton",
+    "Die Deutschen sind unfähig, aus der Geschichte zu lernen.Genauso wie sie 1939 Hitler in den Krieg folgten, so würden sie Heute in ihrer Blindheit, Merkel in den Abgrund folgen. Wladimir Wladimirowitsch Putin",
+    "Verbrenne ihre Synagogen, zwinge sie zur Arbeit und gehe mit ihnen nach aller Unbarmherzigkeit um. Martin Luther",
+    "Luther war ein großer Mann, ein Riese. Mit einem Ruck durchbrach er die Dämmerung: sah den Juden, wie wir ihn erst heute zu sehen beginnen. Adolf Hitler",
+    "Herrgott, gib uns die Kraft, daß wir uns die Freiheit erhalten, unserem Volk, unseren Kindern und unseren Kindeskindern, nicht nur uns Deutschen, sondern auch den anderen Völkern Europas. Denn es ist nicht ein Krieg, den wir alle dieses Mal führen nur für unser deutsches Volk allein, es ist ein Krieg für ganz Europa und damit wirklich für die ganze Menschheit.",
+    "Denn nur ein Volk ohne brot hört auf die befreier aus seiner not und erkennt im völkerherd seines Vaterlandes wert und den der die freiheit uns verwehrt.",
+    "Veni. Vidi. Vici. - Ich kam.Ich sah.Ich siegte. Julius Caesar",
+    "Was interessiert mich mein Geschwätz von gestern. Konrad Adenauer",
+    "Ich bin wie ich bin, die einen kennen mich, die anderen können mich. Konrad Adenauer",
+    "Alles, was die Sozialisten vom Geld verstehen, ist die Tatsache, dass sie es von anderen haben wollen. Konrad Adenauer",
+    "Zuerst ignorieren sie dich, dann lachen sie über dich, dann bekämpfen sie dich und dann gewinnst du. Mahatma Gandhi",
+    "Sei du selbst die Veränderung, die du dir wünschst für diese Welt. Mahatma Gandhi",
+    "Liebe ist die stärkste Macht der Welt, und doch ist sie die demütigste, die man sich vorstellen kann. Mahatma Gandhi",
+    "Stärke wächst nicht aus körperlicher Kraft - vielmehr aus unbeugsamen Willen. Mahatma Gandhi",
+    "Die Freiheit der Meinung setzt voraus, daß man eine hat. Heinrich Heine",
+    "Wenn du den wahren Charakter eines Menschen erkennen willst, dann gib ihm Macht. Abraham Lincoln",
+    "Wer anderen die Freiheit verweigert, verdient sie nicht für sich selbst. Abraham Lincoln",
+    "Demokratie ist die Regierung des Volkes, durch das Volk, für das Volk. Abraham Lincoln",
+    "Je größer die Lüge, desto mehr Menschen folgen ihr. Adolf Hitler",
+    "Und wir wissen, vor uns liegt Deutschland, in uns marschiert Deutschland und hinter uns. Adolf Hitler",
+    "Die Amerikaner haben uns verboten Flugzeuge zu bauen, ich sage, wir werden so viele Flugzeuge bauen, dass der Himmel schwarz ist und die Vögel zu Fuß gehen müssen! Adolf Hitler",
+    "Die Welt will betrügen oder betrogen werden, darum hat die Welt mit der Wahrheit nichts zu schaffen. Martin Luther",
+    "Regierung ist nicht Vernunft, nicht Beredsamkeit – sondern Gewalt. George Washington",
+   
+    ];
 
-const youtube = new YouTube(GOOGLE_API_KEY);
+client.on('ready', () => {
+    console.log('Jawohl, mein Führer!');
 
-const queue = new Map();
-
-client.on('warn', console.warn);
-
-client.on('error', console.error);
-
-client.on('ready', () => console.log('Yo this ready!'));
-
-client.on('disconnect', () => console.log('I just disconnected, making sure you know, I will reconnect now...'));
-
-client.on('reconnecting', () => console.log('I am reconnecting now!'));
-
-client.on('message', async msg => { // eslint-disable-line
-	if (msg.author.bot) return undefined;
-	if (!msg.content.startsWith(PREFIX)) return undefined;
-
-	const args = msg.content.split(' ');
-	const searchString = args.slice(1).join(' ');
-	const url = args[1] ? args[1].replace(/<(.+)>/g, '$1') : '';
-	const serverQueue = queue.get(msg.guild.id);
-
-	let command = msg.content.toLowerCase().split(' ')[0];
-	command = command.slice(PREFIX.length)
-
-	if (command === 'play') {
-		const voiceChannel = msg.member.voiceChannel;
-		if (!voiceChannel) return msg.channel.send('I\'m sorry but you need to be in a voice channel to play music!');
-		const permissions = voiceChannel.permissionsFor(msg.client.user);
-		if (!permissions.has('CONNECT')) {
-			return msg.channel.send('I cannot connect to your voice channel, make sure I have the proper permissions!');
-		}
-		if (!permissions.has('SPEAK')) {
-			return msg.channel.send('I cannot speak in this voice channel, make sure I have the proper permissions!');
-		}
-
-		if (url.match(/^https?:\/\/(www.youtube.com|youtube.com)\/playlist(.*)$/)) {
-			const playlist = await youtube.getPlaylist(url);
-			const videos = await playlist.getVideos();
-			for (const video of Object.values(videos)) {
-				const video2 = await youtube.getVideoByID(video.id); // eslint-disable-line no-await-in-loop
-				await handleVideo(video2, msg, voiceChannel, true); // eslint-disable-line no-await-in-loop
-			}
-			return msg.channel.send(`✅ Playlist: **${playlist.title}** has been added to the queue!`);
-		} else {
-			try {
-				var video = await youtube.getVideo(url);
-			} catch (error) {
-				try {
-					var videos = await youtube.searchVideos(searchString, 10);
-					let index = 0;
-					msg.channel.send(`
-__**Song selection:**__
-${videos.map(video2 => `**${++index} -** ${video2.title}`).join('\n')}
-Please provide a value to select one of the search results ranging from 1-10.
-					`);
-					// eslint-disable-next-line max-depth
-					try {
-						var response = await msg.channel.awaitMessages(msg2 => msg2.content > 0 && msg2.content < 11, {
-							maxMatches: 1,
-							time: 10000,
-							errors: ['time']
-						});
-					} catch (err) {
-						console.error(err);
-						return msg.channel.send('No or invalid value entered, cancelling video selection.');
-					}
-					const videoIndex = parseInt(response.first().content);
-					var video = await youtube.getVideoByID(videos[videoIndex - 1].id);
-				} catch (err) {
-					console.error(err);
-					return msg.channel.send('🆘 I could not obtain any search results.');
-				}
-			}
-			return handleVideo(video, msg, voiceChannel);
-		}
-	} else if (command === 'skip') {
-		if (!msg.member.voiceChannel) return msg.channel.send('You are not in a voice channel!');
-		if (!serverQueue) return msg.channel.send('There is nothing playing that I could skip for you.');
-		serverQueue.connection.dispatcher.end('Skip command has been used!');
-		return undefined;
-	} else if (command === 'stop') {
-		if (!msg.member.voiceChannel) return msg.channel.send('You are not in a voice channel!');
-		if (!serverQueue) return msg.channel.send('There is nothing playing that I could stop for you.');
-		serverQueue.songs = [];
-		serverQueue.connection.dispatcher.end('Stop command has been used!');
-		return undefined;
-	} else if (command === 'volume') {
-		if (!msg.member.voiceChannel) return msg.channel.send('You are not in a voice channel!');
-		if (!serverQueue) return msg.channel.send('There is nothing playing.');
-		if (!args[1]) return msg.channel.send(`The current volume is: **${serverQueue.volume}**`);
-		serverQueue.volume = args[1];
-		serverQueue.connection.dispatcher.setVolumeLogarithmic(args[1] / 5);
-		return msg.channel.send(`I set the volume to: **${args[1]}**`);
-	} else if (command === 'np') {
-		if (!serverQueue) return msg.channel.send('There is nothing playing.');
-		return msg.channel.send(`🎶 Now playing: **${serverQueue.songs[0].title}**`);
-	} else if (command === 'queue') {
-		if (!serverQueue) return msg.channel.send('There is nothing playing.');
-		return msg.channel.send(`
-__**Song queue:**__
-${serverQueue.songs.map(song => `**-** ${song.title}`).join('\n')}
-**Now playing:** ${serverQueue.songs[0].title}
-		`);
-	} else if (command === 'pause') {
-		if (serverQueue && serverQueue.playing) {
-			serverQueue.playing = false;
-			serverQueue.connection.dispatcher.pause();
-			return msg.channel.send('⏸ Paused the music for you!');
-		}
-		return msg.channel.send('There is nothing playing.');
-	} else if (command === 'resume') {
-		if (serverQueue && !serverQueue.playing) {
-			serverQueue.playing = true;
-			serverQueue.connection.dispatcher.resume();
-			return msg.channel.send('▶ Resumed the music for you!');
-		}
-		return msg.channel.send('There is nothing playing.');
-	}
-
-	return undefined;
 });
 
-async function handleVideo(video, msg, voiceChannel, playlist = false) {
-	const serverQueue = queue.get(msg.guild.id);
-	console.log(video);
-	const song = {
-		id: video.id,
-		title: Util.escapeMarkdown(video.title),
-		url: `https://www.youtube.com/watch?v=${video.id}`
-	};
-	if (!serverQueue) {
-		const queueConstruct = {
-			textChannel: msg.channel,
-			voiceChannel: voiceChannel,
-			connection: null,
-			songs: [],
-			volume: 5,
-			playing: true
-		};
-		queue.set(msg.guild.id, queueConstruct);
 
-		queueConstruct.songs.push(song);
+// Set the prefix
+const prefix = "!";
+client.on("message", (message) => {
+  // Exit and stop if it's not there
+  if (!message.content.startsWith(prefix)) return;
+ 
+  if (message.content.startsWith(prefix + "command")) {
+    message.channel.send("Write ![Command] in the Chat for usage." + "\n" + "-quote Displays a Random quote" + "\n" + "-discord Shows discord invite Link");
+  } else
+  if (message.content.startsWith(prefix + "quote")) {
+    message.channel.send(quotes[Math.floor(Math.random() * quotes.length)]);
+  }
+    if (message.content.startsWith(prefix + "discord")) {
+    message.channel.send("https://discord.gg/nzh5Aw" );
+  } 
 
-		try {
-			var connection = await voiceChannel.join();
-			queueConstruct.connection = connection;
-			play(msg.guild, queueConstruct.songs[0]);
-		} catch (error) {
-			console.error(`I could not join the voice channel: ${error}`);
-			queue.delete(msg.guild.id);
-			return msg.channel.send(`I could not join the voice channel: ${error}`);
-		}
-	} else {
-		serverQueue.songs.push(song);
-		console.log(serverQueue.songs);
-		if (playlist) return undefined;
-		else return msg.channel.send(`✅ **${song.title}** has been added to the queue!`);
-	}
-	return undefined;
-}
+});
 
-function play(guild, song) {
-	const serverQueue = queue.get(guild.id);
+ 
 
-	if (!song) {
-		serverQueue.voiceChannel.leave();
-		queue.delete(guild.id);
-		return;
-	}
-	console.log(serverQueue.songs);
+// THIS  MUST  BE  THIS  WAY
 
-	const dispatcher = serverQueue.connection.playStream(ytdl(song.url))
-		.on('end', reason => {
-			if (reason === 'Stream is not generating quickly enough.') console.log('Song ended.');
-			else console.log(reason);
-			serverQueue.songs.shift();
-			play(guild, serverQueue.songs[0]);
-		})
-		.on('error', error => console.error(error));
-	dispatcher.setVolumeLogarithmic(serverQueue.volume / 5);
-
-	serverQueue.textChannel.send(`🎶 Start playing: **${song.title}**`);
-}
-
-client.login(TOKEN);
+client.login(process.env.BOT_TOKEN);//where BOT_TOKEN is the token of our bot
