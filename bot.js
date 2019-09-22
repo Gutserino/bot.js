@@ -62,7 +62,7 @@ client.on("message", (message) => {
     message.channel.send(quotes[Math.floor(Math.random() * quotes.length)]);
   }
     if (message.content.startsWith(prefix + "discord")) {
-    message.channel.send("https://discord.gg/nzh5Aw" );
+    message.channel.send("https://discord.gg/9cHpt9X" );
   } 
   if (message.content.startsWith(prefix + "joke")) {
     message.channel.send(jokes[Math.floor(Math.random() * jokes.length)]);
